@@ -28,5 +28,6 @@ https://boreq.github.io/dots-js
         speed: 50,
         size: 2,
         lineDistance: 200,
-        maxPoints: 50
+        maxPoints: 50,
+        mouseSpawnNumber: 3
     }

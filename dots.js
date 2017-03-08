@@ -1,9 +1,5 @@
 (function ($) {
     $.fn.dots = function (options) {
-        var runEvery = 33;
-        var boundsSize = 200;
-        var spawnDistance = 10;
-
         var settings = $.extend({
             color: "#fff",
             backgroundColor: "#2c3e50",
@@ -13,8 +9,13 @@
             speed: 50,
             size: 2,
             lineDistance: 200,
-            maxPoints: 50
+            maxPoints: 50,
+            mouseSpawnNumber: 3
         }, options);
+
+        var runEvery = 33;
+        var spawnDistance = settings.size + 1;
+        var boundsSize = Math.max(settings.lineDistance, 2 * spawnDistance);
 
         // Get canvas context
         var canvas = this[0];
@@ -34,9 +35,23 @@
             evt = e;
         });
 
+        this.on('mouseleave', function(e) {
+            evt = null;
+        });
+
+        this.on('mouseleave', function(e) {
+            evt = null;
+        });
+
+        this.on('click', function(e) {
+            for (var i = 0; i < settings.mouseSpawnNumber; i++) {
+                points.push(spawnMousePoint());
+            }
+        });
+
         // Create initial points
         fixCanvas();
-        for (var i = 0; i < settings.maxPoints; i ++) {
+        for (var i = 0; i < settings.maxPoints; i++) {
             points.push(spawnInitialPoint());
         }
 
@@ -76,6 +91,17 @@
             speed.y *= settings.speed;
             return {
                 position: vector(canvas.width * Math.random(), canvas.height * Math.random()),
+                speed: speed,
+                size: Math.random() * settings.size + 1
+            };
+        }
+
+        function spawnMousePoint() {
+            var speed = normalize(vector(-1 + 2 * Math.random(), -1 + 2 * Math.random()));
+            speed.x *= settings.speed;
+            speed.y *= settings.speed;
+            return {
+                position: vector(getMousePos().x, getMousePos().y),
                 speed: speed,
                 size: Math.random() * settings.size + 1
             };
@@ -227,10 +253,9 @@
 
             ctx.fillStyle = settings.color;
             ctx.strokeStyle = settings.color;
+            ctx.globalAlpha = settings.pointOpacity;
 
             var i;
-
-            ctx.globalAlpha = settings.pointOpacity;
 
             for (i = 0; i < points.length; i++) {
                 var point = points[i];
